@@ -33,6 +33,19 @@ export default {
 
       return new Response("OK");
     }
+    if (request.method === "DELETE" && url.pathname === "/news") {
+  const token = request.headers.get("X-RSS-Token");
+  if (token !== env.RSS_TOKEN) {
+    return new Response("Unauthorized", { status: 401, headers: CORS });
+  }
+
+  const { id } = await request.json<{ id: string }>();
+  await env.RSS.prepare("DELETE FROM news WHERE id = ?")
+    .bind(id)
+    .run();
+
+  return new Response("OK", { headers: CORS });
+}
     if (request.method === "GET" && url.pathname === "/rss") {
       const result = await env.RSS.prepare(
         "SELECT id, name, content, date FROM news ORDER BY date DESC LIMIT 100",
