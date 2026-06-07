@@ -1,0 +1,5 @@
+account_id = "12dd4bc04b7bf35b9f0ce69738b3a107"
+[[d1_databases]]
+binding = "RSS"
+database_name = "rss-db"
+database_id = "b06f33bc-74d3-4e3e-b109-cfd34bb785da"
