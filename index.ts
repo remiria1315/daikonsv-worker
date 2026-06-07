@@ -4,7 +4,7 @@ type NewsRow = {
   content: string;
   date: number;
 };
-
+const CORS = { "Access-Control-Allow-Origin": "*" };
 export default {
   async fetch(request: Request, env: Env) {
     const url = new URL(request.url);
@@ -15,7 +15,7 @@ export default {
       ).run<NewsRow>();
 
       return new Response(JSON.stringify(result.results), {
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...CORS },
       });
     }
     if (request.method === "PUT" && url.pathname === "/news") {
@@ -62,7 +62,7 @@ export default {
 </rss>`;
 
       return new Response(xml, {
-        headers: { "Content-Type": "application/rss+xml" },
+        headers: { "Content-Type": "application/rss+xml", ...CORS },
       });
     }
     return new Response("Not Found", { status: 404 });
