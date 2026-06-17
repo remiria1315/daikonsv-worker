@@ -3,6 +3,8 @@ type NewsRow = {
   name: string;
   content: string;
   date: number;
+  author: string;
+  icon: string;
 };
 const CORS = { "Access-Control-Allow-Origin": "*" };
 export default {
@@ -11,7 +13,7 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/news") {
       const result = await env.RSS.prepare(
-        "SELECT id, name, content, date FROM news ORDER BY date DESC LIMIT 100",
+        "SELECT id, name, content, date, author, icon FROM news ORDER BY date DESC LIMIT 100",
       ).run<NewsRow>();
 
       return new Response(JSON.stringify(result.results), {
@@ -24,31 +26,30 @@ export default {
         return new Response("Unauthorized", { status: 401 });
       }
 
-      const { name, content, date } = await request.json<NewsRow>();
+      const { name, content, date, author, icon } =
+        await request.json<NewsRow>();
       await env.RSS.prepare(
-        "INSERT INTO news (id, name, content, date) VALUES (?, ?, ?, ?)",
+        "INSERT INTO news (id, name, content, date, author, icon) VALUES (?, ?, ?, ?, ?, ?)",
       )
-        .bind(crypto.randomUUID(), name, content, date)
+        .bind(crypto.randomUUID(), name, content, date, author, icon)
         .run();
 
       return new Response("OK");
     }
     if (request.method === "DELETE" && url.pathname === "/news") {
-  const token = request.headers.get("X-RSS-Token");
-  if (token !== env.RSS_TOKEN) {
-    return new Response("Unauthorized", { status: 401, headers: CORS });
-  }
+      const token = request.headers.get("X-RSS-Token");
+      if (token !== env.RSS_TOKEN) {
+        return new Response("Unauthorized", { status: 401, headers: CORS });
+      }
 
-  const { id } = await request.json<{ id: string }>();
-  await env.RSS.prepare("DELETE FROM news WHERE id = ?")
-    .bind(id)
-    .run();
+      const { id } = await request.json<{ id: string }>();
+      await env.RSS.prepare("DELETE FROM news WHERE id = ?").bind(id).run();
 
-  return new Response("OK", { headers: CORS });
-}
+      return new Response("OK", { headers: CORS });
+    }
     if (request.method === "GET" && url.pathname === "/rss") {
       const result = await env.RSS.prepare(
-        "SELECT id, name, content, date FROM news ORDER BY date DESC LIMIT 100",
+        "SELECT id, name, content, date, author, icon FROM news ORDER BY date DESC LIMIT 100",
       ).run<NewsRow>();
 
       const items = result.results
@@ -59,6 +60,8 @@ export default {
       <description>${row.content}</description>
       <pubDate>${new Date(row.date * 1000).toUTCString()}</pubDate>
       <guid>${row.id}</guid>
+      <author>${row.author}</author>
+      <enclosure url="${row.icon}" type="image/png" length="0"/>
     </item>
   `,
         )
