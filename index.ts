@@ -6,6 +6,7 @@ type NewsRow = {
   author: string;
   icon: string;
 };
+
 const CORS = { "Access-Control-Allow-Origin": "*" };
 export default {
   async fetch(request: Request, env: Env) {
