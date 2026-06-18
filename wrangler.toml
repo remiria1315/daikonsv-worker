@@ -2,7 +2,7 @@ name = "daikonsv-worker"
 main = "index.ts"
 compatibility_date = "2026-06-07"
 
-account_id = "12dd4bc04b7bf35b9f0ce69738b3a107"
+account_id = "5db62c40fa12568a80a8667cd5713801"
 [[d1_databases]]
 binding = "RSS"
 database_name = "rss-db"
