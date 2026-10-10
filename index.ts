@@ -33,7 +33,7 @@ const sha256 = async (text: string) => {
 const authorized = async (request: Request, env: Env, userId: unknown) => {
   const token = request.headers.get("Authorization")?.replace(/^Bearer /, "");
   if (!token || typeof userId !== "string" || !userId) return false;
-  const row = await env.RSS.prepare(
+  const row = await env.users_db.prepare(
     "SELECT id FROM tokens WHERE token_hash = ? AND user_id = ?",
   )
     .bind(await sha256(token), userId)
